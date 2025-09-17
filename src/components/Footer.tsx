@@ -60,7 +60,7 @@ export function Footer() {
 
       {/* Средняя часть: 2 столбца — Навигация и Контакты */}
 <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10">
+  <div className="grid grid-cols-2 gap-8">
     {/* Навигация */}
     <div>
       <h3 className="text-sm font-semibold text-[#EBF1FF]">Навигация</h3>
