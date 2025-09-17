@@ -73,7 +73,7 @@ export function Hero() {
         </div>
 
         {/* Правая колонка — телефоны (оставил как есть) */}
-        <div className="order-1 lg:order-2 relative flex h-[360px] sm:h-[500px] lg:h-[560px] items-center justify-center flex-wrap sm:flex-nowrap gap-4 sm:gap-0">
+        <div className = "order-1 lg:order-2 hidden lg:flex relative items-center justify-center gap-4 lg:h-[560px]">
           {/* iPhone */}
           <motion.div
             initial={{ opacity: 0, y: 40, rotate: -16 }}
