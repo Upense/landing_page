@@ -105,13 +105,13 @@ export function Header() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 safe-y">
             <div className="flex items-center justify-between gap-4">
               {/* ЛОГО с анимацией */}
-              <motion.a
-                href="#main"
-                whileHover={{ rotate: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-3"
-                onClick={(e) => onNavClick(e as any, "main")}
-              >
+             <motion.a
+  href="#main"
+  whileHover={{ rotate: -2, scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
+  className="flex items-center gap-3"
+  onClick={(e) => onNavClick(e, "main")}    // ← вот так
+>
                 <img
                   src="/upense_logo_split.png"
                   alt="Upense"
