@@ -14,15 +14,11 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
 
-  // Прогресс-бар прокрутки
+  // Прогресс-бар только для ≥ md
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 20,
-    mass: 0.3,
-  });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 20, mass: 0.3 });
 
-  // Закрывать меню при переходе по якорю
+  // Закрыть мобильное меню при переходе по якорю
   useEffect(() => {
     const onHashChange = () => setOpen(false);
     window.addEventListener("hashchange", onHashChange);
@@ -30,24 +26,17 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50">
+    // Мобилка: fixed (чтобы НИКОГДА не пропадал при скролле)
+    // ≥ md: sticky (как раньше)
+    <header className="fixed inset-x-0 top-0 z-50 md:sticky md:top-0 md:inset-auto">
       <div className="relative">
-        {/* === Десктоп/планшет: полоса прогресса === */}
+        {/* Прогресс-бар: только ≥ md */}
         <motion.div
           style={{ scaleX, transformOrigin: "left" }}
-          className="
-            pointer-events-none
-            hidden md:block
-            absolute inset-x-0 top-0
-            h-[3px] md:h-1
-            bg-[#DCFF0F]
-            z-30
-            will-change-transform
-            [transform:translateZ(0)]
-          "
+          className="pointer-events-none absolute inset-x-0 top-0 hidden h-[3px] bg-[#DCFF0F] md:block md:h-1 z-30"
         />
 
-        {/* Навбар */}
+        {/* Хедерная панель */}
         <div className="border-b border-white/5 bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55">
           {/* Ссылка для скринридеров */}
           <a
@@ -58,8 +47,13 @@ export function Header() {
           </a>
 
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between gap-4">
-              {/* Логотип */}
+            <div
+              className="
+                flex h-16 items-center justify-between gap-4
+                pt-[env(safe-area-inset-top)] md:pt-0
+              "
+            >
+              {/* Лого */}
               <a href="#main" className="flex items-center gap-3">
                 <img
                   src="/upense_logo_split.png"
@@ -71,7 +65,7 @@ export function Header() {
               </a>
 
               {/* Десктоп-меню */}
-              <nav className="hidden md:flex items-center gap-8">
+              <nav className="hidden items-center gap-8 md:flex">
                 {links.map((l) => (
                   <a
                     key={l.id}
@@ -137,6 +131,9 @@ export function Header() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Компенсирующий отступ для fixed-хедера на мобилке */}
+      <div className="h-16 md:hidden" aria-hidden />
     </header>
   );
 }
