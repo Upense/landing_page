@@ -41,7 +41,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="fixed top-0 z-50">
       <div className="relative">
         {/* Прогресс-полоска: видно только на десктопе, лежит ПОВЕРХ блюра */}
         <motion.div
