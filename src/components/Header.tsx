@@ -17,7 +17,23 @@ export function Header() {
   // Прогресс-бар оставим только ≥ md
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 20, mass: 0.3 });
+  const onNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  e.preventDefault();
+  setOpen(false);
 
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const header = document.querySelector("header");
+  const offset = header
+    ? (header as HTMLElement).getBoundingClientRect().height
+    : 0;
+
+  // позиция секции относительно документа
+  const top = window.scrollY + el.getBoundingClientRect().top - offset - 8; // небольшой зазор
+
+  window.scrollTo({ top, behavior: "smooth" });
+};
   useEffect(() => {
     const onHashChange = () => setOpen(false);
     window.addEventListener("hashchange", onHashChange);
@@ -59,15 +75,16 @@ export function Header() {
               {/* Десктоп-меню */}
               <nav className="hidden md:flex items-center gap-8">
                 {links.map((l) => (
-                  <a
-                    key={l.id}
-                    href={`#${l.id}`}
-                    className="group relative text-[#EBF1FF]/80 hover:text-[#EBF1FF] transition-colors ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-                  >
-                    <span>{l.label}</span>
-                    <span className="pointer-events-none absolute -bottom-1 left-0 block h-[2px] w-0 bg-[#DCFF0F] transition-[width] duration-300 ease-out group-hover:w-full" />
-                  </a>
-                ))}
+  <a
+    key={l.id}
+    href={`#${l.id}`}
+    onClick={(e) => onNavClick(e, l.id)}
+    className="group relative text-[#EBF1FF]/80 hover:text-[#EBF1FF] ..."
+  >
+    <span>{l.label}</span>
+    <span className="pointer-events-none absolute -bottom-1 left-0 block h-[2px] w-0 bg-[#DCFF0F] transition-[width] duration-300 ease-out group-hover:w-full" />
+  </a>
+))}
               </nav>
 
               {/* CTA + бургер */}
