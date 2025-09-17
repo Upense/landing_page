@@ -85,7 +85,7 @@ export function Footer() {
     </div>
 
     {/* Контакты */}
-    <div className="sm:justify-self-end sm:text-right">
+    <div>
       <h3 className="text-sm font-semibold text-[#EBF1FF]">Контакты</h3>
       <ul className="mt-4 space-y-3 text-sm">
         {/* Email */}
