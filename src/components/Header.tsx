@@ -14,7 +14,7 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
 
-  // Прогресс-бар
+  // Прогресс-бар прокрутки
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 120,
@@ -22,7 +22,7 @@ export function Header() {
     mass: 0.3,
   });
 
-  // Закрываем мобильное меню при переходе по якорю
+  // Закрывать меню при переходе по якорю
   useEffect(() => {
     const onHashChange = () => setOpen(false);
     window.addEventListener("hashchange", onHashChange);
@@ -30,11 +30,9 @@ export function Header() {
   }, []);
 
   return (
-    // sticky — чтобы не пропадал при «скрытии» адресной строки на iOS
     <header className="sticky top-0 z-50">
-      {/* Обёртка для позиционирования десктопной полосы */}
       <div className="relative">
-        {/* === ДЕСКТОП/ПЛАНШЕТ: полоса прогресса внутри header, поверх blur-блока === */}
+        {/* === Десктоп/планшет: полоса прогресса === */}
         <motion.div
           style={{ scaleX, transformOrigin: "left" }}
           className="
@@ -43,26 +41,7 @@ export function Header() {
             absolute inset-x-0 top-0
             h-[3px] md:h-1
             bg-[#DCFF0F]
-            z-30               /* выше блока с backdrop-blur */
-            will-change-transform
-            [transform:translateZ(0)]
-          "
-        />
-
-        {/* === Мобилка: фиксированная полоса прогресса === */}
-        <motion.div
-          style={{
-            scaleX,
-            transformOrigin: "left",
-            top: "env(safe-area-inset-top, 0px)",
-          }}
-          className="
-            md:hidden
-            fixed left-0 right-0
-            h-[3px]
-            bg-[#DCFF0F]
-            z-[70]
-            pointer-events-none
+            z-30
             will-change-transform
             [transform:translateZ(0)]
           "
@@ -100,7 +79,6 @@ export function Header() {
                     className="group relative text-[#EBF1FF]/80 transition-colors ease-out hover:text-[#EBF1FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                   >
                     <span>{l.label}</span>
-                    {/* подчёркивание при hover */}
                     <span className="pointer-events-none absolute -bottom-1 left-0 block h-[2px] w-0 bg-[#DCFF0F] transition-[width] duration-300 ease-out group-hover:w-full" />
                   </a>
                 ))}
