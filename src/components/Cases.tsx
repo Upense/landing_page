@@ -95,7 +95,7 @@ export function Cases() {
   return (
     <section
       id="cases"
-      className="relative bg-black scroll-mt-28 md:scroll-mt-32 py-16 sm:py-20 lg:py-24 border-t border-white/5"
+      className="relative bg-black scroll-mt-[273px] md:scroll-mt-32 py-16 sm:py-20 lg:py-24 border-t border-white/5"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeIn>
