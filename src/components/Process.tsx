@@ -4,14 +4,7 @@ import React from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { FadeIn } from "@/components/FadeIn";
 import {
-  Search,
-  Ruler,
-  CalendarClock,
-  Code2,
-  TestTube,
-  Rocket,
-  BarChart3,
-  Wrench,
+  Search, Ruler, CalendarClock, Code2, TestTube, Rocket, BarChart3, Wrench,
 } from "lucide-react";
 
 /* ---------- Types & Data ---------- */
@@ -75,28 +68,16 @@ const detailIn: Variants = {
 const bulletsParent: Variants = { show: { transition: { staggerChildren: 0.08, delayChildren: 0.06 } } };
 const bulletItem: Variants = { hidden: { opacity: 0, x: -8 }, show: { opacity: 1, x: 0, transition: { duration: 0.25 } } };
 
-/* ---------- Desktop Step Item (sidebar) ---------- */
+/* ---------- Desktop Step Item ---------- */
 function StepItem({
-  active,
-  onClick,
-  step,
-}: {
-  active: boolean;
-  onClick: () => void;
-  step: Step;
-}) {
+  active, onClick, step,
+}: { active: boolean; onClick: () => void; step: Step }) {
   return (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ x: 4 }}
-      className="group relative mb-2 w-full pl-12 text-left"
-    >
-      {/* ID */}
+    <motion.button onClick={onClick} whileHover={{ x: 4 }} className="group relative mb-2 w-full pl-12 text-left">
       <span className="absolute left-0 top-1/2 -translate-y-1/2 select-none text-[11px] font-semibold tracking-wide text-[#A3AEC2]">
         {step.id}
       </span>
 
-      {/* Точка */}
       <motion.span
         aria-hidden
         animate={active ? {
@@ -111,7 +92,6 @@ function StepItem({
         className={`absolute left-6 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full ${active ? "bg-[#DCFF0F]" : "bg-white/30"}`}
       />
 
-      {/* Подсветка активного */}
       <AnimatePresence>
         {active && (
           <motion.div
@@ -124,12 +104,9 @@ function StepItem({
         )}
       </AnimatePresence>
 
-      {/* Плашка */}
-      <div
-        className={`relative rounded-xl border px-4 py-4 pr-5 transition-colors flex items-center gap-3 ${
-          active ? "border-[#DCFF0F]/60 bg-black/40" : "border-white/10 bg-black/20 group-hover:bg-white/5"
-        }`}
-      >
+      <div className={`relative rounded-xl border px-4 py-4 pr-5 transition-colors flex items-center gap-3 ${
+        active ? "border-[#DCFF0F]/60 bg-black/40" : "border-white/10 bg-black/20 group-hover:bg-white/5"
+      }`}>
         <span className={`text-[#EBF1FF] ${active ? "" : "opacity-80"}`}>{step.icon}</span>
         <span className={`text-sm ${active ? "text-[#EBF1FF]" : "text-[#EBF1FF]/85"}`}>{step.title}</span>
       </div>
@@ -137,22 +114,13 @@ function StepItem({
   );
 }
 
-/* ---------- Mobile Row + Inline Detail (accordion) ---------- */
+/* ---------- Mobile Row (Accordion) ---------- */
 function MobileRow({
-  step,
-  expanded,
-  onToggle,
-}: {
-  step: Step;
-  expanded: boolean;
-  onToggle: () => void;
-}) {
+  step, expanded, onToggle,
+}: { step: Step; expanded: boolean; onToggle: () => void }) {
   return (
     <li className="border border-white/10 rounded-xl bg-[#0B0F14]">
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left"
-      >
+      <button onClick={onToggle} className="flex w-full items-center gap-3 px-4 py-3 text-left">
         <span className="grid h-8 w-8 place-items-center rounded-xl border border-white/10 bg-black/20 text-[#EBF1FF]">
           {step.icon}
         </span>
@@ -160,12 +128,7 @@ function MobileRow({
           <div className="text-sm text-[#EBF1FF]">{step.title}</div>
           <div className="text-[11px] text-[#A3AEC2] mt-0.5">{step.id}</div>
         </div>
-        <motion.span
-          animate={{ rotate: expanded ? 90 : 0 }}
-          className="ml-2 text-[#A3AEC2]"
-        >
-          ▸
-        </motion.span>
+        <motion.span animate={{ rotate: expanded ? 90 : 0 }} className="ml-2 text-[#A3AEC2]">▸</motion.span>
       </button>
 
       <AnimatePresence initial={false}>
@@ -203,39 +166,32 @@ function MobileRow({
 
 /* ---------- Process Section ---------- */
 export function Process() {
-  const [activeId, setActiveId] = React.useState<string>("A1"); // desktop state
-  const active = steps.find((s) => s.id === activeId)!;
+  // ключевое изменение: допускаем null и всегда имеем фолбэк
+  const [activeId, setActiveId] = React.useState<string | null>("A1");
+  const active = steps.find((s) => s.id === activeId) ?? steps[0];
 
   const renderGroup = (phase: "A" | "B", label: string) => (
     <div className="mb-5">
       <div className="mb-2 pl-12 text-[11px] font-semibold uppercase tracking-wider text-[#A3AEC2]">
         {label}
       </div>
-      {steps
-        .filter((s) => s.phase === phase)
-        .map((s) => (
-          <StepItem
-            key={s.id}
-            step={s}
-            active={s.id === activeId}
-            onClick={() => setActiveId(s.id)}
-          />
-        ))}
+      {steps.filter((s) => s.phase === phase).map((s) => (
+        <StepItem
+          key={s.id}
+          step={s}
+          active={s.id === activeId}
+          onClick={() => setActiveId(s.id)}
+        />
+      ))}
     </div>
   );
 
   return (
-    <section
-      id="process"
-      className="relative border-t border-white/5 bg-black scroll-mt-28 md:scroll-mt-32 py-16 sm:py-20 lg:py-24"
-    >
-      {/* Заголовок — как в других секциях */}
+    <section id="process" className="relative border-t border-white/5 bg-black scroll-mt-28 md:scroll-mt-32 py-16 sm:py-20 lg:py-24">
       <FadeIn>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-10 text-left">
           <div className="inline-block">
-            <h2 className="text-3xl font-semibold tracking-tight text-[#EBF1FF] inline-block">
-              Как мы работаем
-            </h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-[#EBF1FF] inline-block">Как мы работаем</h2>
             <motion.span
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -251,46 +207,39 @@ export function Process() {
         </div>
       </FadeIn>
 
-      {/* ----- Mobile (< md): аккордеон, 1 колонка ----- */}
+      {/* Mobile (< md): accordion */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:hidden">
-        {/* Фаза A */}
         <div className="mb-6">
-          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#A3AEC2]">
-            ФАЗА A — R&D
-          </div>
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#A3AEC2]">ФАЗА A — R&D</div>
           <ul className="space-y-3">
             {steps.filter(s => s.phase === "A").map((s) => (
               <MobileRow
                 key={s.id}
                 step={s}
                 expanded={s.id === activeId}
-                onToggle={() => setActiveId(prev => prev === s.id ? "" : s.id)}
+                onToggle={() => setActiveId(prev => (prev === s.id ? null : s.id))}
               />
             ))}
           </ul>
         </div>
 
-        {/* Фаза B */}
         <div>
-          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#A3AEC2]">
-            ФАЗА B — Разработка
-          </div>
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#A3AEC2]">ФАЗА B — Разработка</div>
           <ul className="space-y-3">
             {steps.filter(s => s.phase === "B").map((s) => (
               <MobileRow
                 key={s.id}
                 step={s}
                 expanded={s.id === activeId}
-                onToggle={() => setActiveId(prev => prev === s.id ? "" : s.id)}
+                onToggle={() => setActiveId(prev => (prev === s.id ? null : s.id))}
               />
             ))}
           </ul>
         </div>
       </div>
 
-      {/* ----- Desktop / Tablet (≥ md): как было ----- */}
+      {/* Desktop / Tablet (≥ md) */}
       <div className="mx-auto hidden max-w-7xl gap-8 px-4 sm:px-6 md:grid md:grid-cols-3 lg:gap-12 lg:px-8">
-        {/* Левый сайдбар */}
         <aside className="lg:col-span-1 lg:sticky lg:top-24 self-start">
           <div className="relative">
             <div className="absolute left-7 top-0 bottom-0 w-px bg-white/10" />
@@ -299,11 +248,10 @@ export function Process() {
           </div>
         </aside>
 
-        {/* Контент справа */}
         <div className="lg:col-span-2">
           <AnimatePresence mode="wait">
             <motion.div
-              key={active.id}
+              key={active.id}                // всегда существует за счёт фолбэка
               id="process-detail"
               variants={detailIn}
               initial="hidden"
