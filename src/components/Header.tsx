@@ -14,11 +14,9 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
 
-  // Прогресс-бар прокрутки (держим его внутри шапки)
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 20, mass: 0.3 });
 
-  // закрываем моб.меню при переходе по якорю (вдруг пользователь тапнул ссылку)
   useEffect(() => {
     const onHashChange = () => setOpen(false);
     window.addEventListener("hashchange", onHashChange);
@@ -30,12 +28,6 @@ export function Header() {
     <header className="sticky top-0 z-50">
       {/* Внутренняя обёртка нужна, чтобы прогресс-бар позиционировался относительно шапки */}
       <div className="relative">
-        {/* Полоска прогресса — привязана к header, а не к окну */}
-        <motion.div
-          style={{ scaleX, transformOrigin: "left" }}
-          className="pointer-events-none absolute inset-x-0 top-0 h-0.5 sm:h-1 bg-[#DCFF0F]"
-        />
-
         {/* Навбар */}
         <div className="bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55 border-b border-white/5">
           {/* Ссылка для скринридеров */}
@@ -125,6 +117,17 @@ export function Header() {
             )}
           </AnimatePresence>
         </div>
+        <motion.div
+          style={{ scaleX, transformOrigin: "left" }}
+          className="
+            pointer-events-none
+            absolute inset-x-0 top-0
+            h-[3px] sm:h-1
+            bg-[#DCFF0F]
+            z-20     /* выше слоя с блюром */
+            will-change-transform
+          "
+        />
       </div>
     </header>
   );
