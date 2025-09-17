@@ -131,9 +131,6 @@ export function Header() {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Компенсирующий отступ для fixed-хедера на мобилке */}
-      <div className="h-16 md:hidden" aria-hidden />
     </header>
   );
 }
