@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
@@ -14,9 +14,15 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
 
+  // Прогресс-бар
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 20, mass: 0.3 });
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 20,
+    mass: 0.3,
+  });
 
+  // Закрываем мобильное меню при переходе по якорю
   useEffect(() => {
     const onHashChange = () => setOpen(false);
     window.addEventListener("hashchange", onHashChange);
@@ -24,12 +30,46 @@ export function Header() {
   }, []);
 
   return (
-    // ГЛАВНОЕ: sticky вместо fixed — не исчезает при «скрытии» адресной строки на iOS
+    // sticky — чтобы не пропадал при «скрытии» адресной строки на iOS
     <header className="sticky top-0 z-50">
-      {/* Внутренняя обёртка нужна, чтобы прогресс-бар позиционировался относительно шапки */}
+      {/* Обёртка для позиционирования десктопной полосы */}
       <div className="relative">
+        {/* === ДЕСКТОП/ПЛАНШЕТ: полоса прогресса внутри header, поверх blur-блока === */}
+        <motion.div
+          style={{ scaleX, transformOrigin: "left" }}
+          className="
+            pointer-events-none
+            hidden md:block
+            absolute inset-x-0 top-0
+            h-[3px] md:h-1
+            bg-[#DCFF0F]
+            z-30               /* выше блока с backdrop-blur */
+            will-change-transform
+            [transform:translateZ(0)]
+          "
+        />
+
+        {/* === Мобилка: фиксированная полоса прогресса === */}
+        <motion.div
+          style={{
+            scaleX,
+            transformOrigin: "left",
+            top: "env(safe-area-inset-top, 0px)",
+          }}
+          className="
+            md:hidden
+            fixed left-0 right-0
+            h-[3px]
+            bg-[#DCFF0F]
+            z-[70]
+            pointer-events-none
+            will-change-transform
+            [transform:translateZ(0)]
+          "
+        />
+
         {/* Навбар */}
-        <div className="bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55 border-b border-white/5">
+        <div className="border-b border-white/5 bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55">
           {/* Ссылка для скринридеров */}
           <a
             href="#main"
@@ -57,9 +97,10 @@ export function Header() {
                   <a
                     key={l.id}
                     href={`#${l.id}`}
-                    className="group relative text-[#EBF1FF]/80 hover:text-[#EBF1FF] transition-colors ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                    className="group relative text-[#EBF1FF]/80 transition-colors ease-out hover:text-[#EBF1FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                   >
                     <span>{l.label}</span>
+                    {/* подчёркивание при hover */}
                     <span className="pointer-events-none absolute -bottom-1 left-0 block h-[2px] w-0 bg-[#DCFF0F] transition-[width] duration-300 ease-out group-hover:w-full" />
                   </a>
                 ))}
@@ -74,7 +115,7 @@ export function Header() {
                   Обсудить проект
                 </a>
                 <button
-                  className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#EBF1FF] hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F]"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-[#EBF1FF] hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DCFF0F] md:hidden"
                   aria-label={open ? "Закрыть меню" : "Открыть меню"}
                   onClick={() => setOpen((v) => !v)}
                 >
@@ -94,7 +135,7 @@ export function Header() {
                 transition={{ duration: 0.2 }}
                 className="md:hidden border-t border-white/10 bg-black/90"
               >
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 space-y-1">
+                <div className="mx-auto max-w-7xl space-y-1 px-4 py-4 sm:px-6 lg:px-8">
                   {links.map((l) => (
                     <a
                       key={l.id}
@@ -117,17 +158,6 @@ export function Header() {
             )}
           </AnimatePresence>
         </div>
-        <motion.div
-          style={{ scaleX, transformOrigin: "left" }}
-          className="
-            pointer-events-none
-            absolute inset-x-0 top-0
-            h-[3px] sm:h-1
-            bg-[#DCFF0F]
-            z-20     /* выше слоя с блюром */
-            will-change-transform
-          "
-        />
       </div>
     </header>
   );
