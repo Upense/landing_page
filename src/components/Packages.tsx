@@ -1,17 +1,30 @@
 "use client";
 
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { FadeIn } from "@/components/FadeIn";
 
+/* =========================
+   Types
+========================== */
 type Pkg = {
-  key: "CFA" | "MVP" | "Business+";
-  title: string; // оставим в типе на будущее, но не отображаем
+  key: "CFA" | "MVP" | "FPL";
+  title: string;
   price?: string;
+  term?: string;
   desc: string;
   features: string[];
 };
 
-// анимации
+type SLAPlan = {
+  name: "SLA Silver" | "SLA Gold" | "SLA Platinum";
+  price: string;          // ₽/мес
+  bullets: string[];
+};
+
+/* =========================
+   Animations
+========================== */
 const gridParent: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
@@ -27,7 +40,9 @@ const cardItem: Variants = {
   },
 };
 
-// общий бейдж
+/* =========================
+   UI bits
+========================== */
 function BigBadge({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
@@ -43,7 +58,34 @@ function BigBadge({ children }: { children: React.ReactNode }) {
   );
 }
 
-function PriceCard({ pkg }: { pkg: Pkg }) {
+function MetaBadge({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string;
+}) {
+  if (!value) return null;
+  return (
+    <div className="flex h-12 w-full items-center rounded-xl border border-white/10 bg-black/40 px-4 text-sm">
+      <span className="text-[#A3AEC2]">{label}:</span>
+      <span className="ml-2 text-base font-semibold text-[#EBF1FF]">{value}</span>
+    </div>
+  );
+}
+
+/* =========================
+   Price card (packages)
+========================== */
+function PriceCard({
+  pkg,
+  descStyle,
+  descRef,
+}: {
+  pkg: Pkg;
+  descStyle?: React.CSSProperties;
+  descRef?: React.Ref<HTMLParagraphElement>;
+}) {
   return (
     <motion.div
       variants={cardItem}
@@ -53,33 +95,29 @@ function PriceCard({ pkg }: { pkg: Pkg }) {
       className="group h-full rounded-xl border border-white/10 bg-[#0B0F14] p-6 sm:p-7 hover:shadow-xl hover:shadow-[#DCFF0F]/5"
     >
       <div className="flex h-full flex-col">
-        {/* КРУПНЫЙ БЕЙДЖ (вместо заголовка) */}
         <div className="mb-5">
           <BigBadge>{pkg.key}</BigBadge>
         </div>
 
-        {/* Описание — 3 строки, фиксируем минимальную высоту, чтобы цена была на одном уровне */}
-        <p className="text-sm text-[#A3AEC2] leading-relaxed line-clamp-3 min-h-[96px] sm:min-h-[108px] lg:min-h-[120px]">
+        <p
+          ref={descRef}
+          style={descStyle}
+          className="text-sm text-[#A3AEC2] leading-relaxed"
+        >
           {pkg.desc}
         </p>
 
-        {/* Цена — единый размер бейджа */}
-        {pkg.price && (
-          <div className="mt-5 inline-flex h-12 min-w-[220px] items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-4 text-sm">
-            <span className="text-[#A3AEC2]">Стоимость:</span>
-            <span className="text-base font-semibold text-[#EBF1FF]">{pkg.price}</span>
-          </div>
-        )}
+        <div className="mt-5 space-y-3">
+          <MetaBadge label="Стоимость" value={pkg.price} />
+          <MetaBadge label="Срок" value={pkg.term} />
+        </div>
 
-        {/* Фичи — вниз, не смещают цену */}
         <ul className="mt-5 space-y-2 text-sm text-[#A3AEC2] flex-1">
           {pkg.features.map((f, i) => (
             <li key={i} className="flex items-start gap-2">
-              <motion.span
+              <span
                 aria-hidden
                 className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#DCFF0F]"
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 2.4 + i * 0.2, repeat: Infinity, ease: "easeInOut" }}
               />
               {f}
             </li>
@@ -90,79 +128,172 @@ function PriceCard({ pkg }: { pkg: Pkg }) {
   );
 }
 
-function EnterpriseCard() {
+/* =========================
+   SLA section (3 plans)
+========================== */
+function SLASection() {
+  const plans: SLAPlan[] = [
+    {
+      name: "SLA Silver",
+      price: "49 000 ₽/мес",
+      bullets: [
+        "99.0% аптайм, реакция 8×5 / 4ч",
+        "Мониторинг, краш-триаж, минорные обновления",
+        "Включено 30 часов хотфиксов/мес",
+      ],
+    },
+    {
+      name: "SLA Gold",
+      price: "99 000 ₽/мес",
+      bullets: [
+        "99.5% аптайм, 24×5 / 2ч",
+        "Профилактические релизы, перф-тюнинг по бюджету",
+        "Больше часов хотфиксов + приоритет в очереди",
+      ],
+    },
+    {
+      name: "SLA Platinum",
+      price: "199 000 ₽/мес",
+      bullets: [
+        "99.9% аптайм, 24×7 / 1ч",
+        "Дежурства, инцидент-менеджмент, post-mortems",
+        "Расширенный бюджет хотфиксов/мес",
+      ],
+    },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0B0F14] p-6 sm:p-8"
+      className="mt-10 overflow-hidden rounded-xl border border-white/10 bg-[#0B0F14] p-6 sm:p-8"
     >
-      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-3xl">
-          {/* Тот же крупный бейдж */}
-          <BigBadge>Enterprise</BigBadge>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <BigBadge>SLA — поддержка и сопровождение</BigBadge>
+        </div>
+        {/* CTA при желании можно добавить сюда */}
+      </div>
 
-          <p className="mt-4 text-[#A3AEC2]">
-            Интеграции с внутренними системами, безопасность, SLA и процессы корпоративного уровня.
-          </p>
-        </div>
-        <div className="shrink-0">
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            href="#contact"
-            className="inline-flex items-center justify-center rounded-xl bg-[#DCFF0F] px-5 py-3 font-semibold text-black shadow-[0_0_0_1px_rgba(220,255,15,0.25)] hover:brightness-95"
+      <div className="grid gap-6 md:grid-cols-3">
+        {plans.map((p) => (
+          <div
+            key={p.name}
+            className="rounded-xl border border-white/10 bg-black/30 p-5"
           >
-            Заказать консультацию
-          </motion.a>
-        </div>
+            <div className="mb-3">
+              <div className="text-base font-semibold text-[#EBF1FF]">
+                {p.name}
+              </div>
+              <div className="mt-2 flex h-12 w-full items-center rounded-xl border border-white/10 bg-black/40 px-4 text-sm">
+                <span className="text-[#A3AEC2]">Стоимость:</span>
+                <span className="ml-2 text-base font-semibold text-[#EBF1FF]">
+                  {p.price}
+                </span>
+              </div>
+            </div>
+
+            <ul className="mt-4 space-y-2 text-sm text-[#A3AEC2]">
+              {p.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span
+                    aria-hidden
+                    className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#DCFF0F]"
+                  />
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </motion.div>
   );
 }
 
+/* =========================
+   Section
+========================== */
 export function Packages() {
-  const pkgs: Pkg[] = [
-    {
-      key: "CFA",
-      title: "CFA — Core Feature App",
-      price: "190 000₽",
-      desc:
-        "Мини-приложение вокруг одного ключевого сценария. Проверяем гипотезу на реальных пользователях и получаем первые метрики. Запуск 2–4 недели, минимальные риски и бюджет.",
-      features: [
-        "Одна core-функция + базовый UX/UI",
-        "Запуск тестов на реальных пользователях",
-        "Подготовка к публикации в App Store / Google Play",
-      ],
-    },
-    {
-      key: "MVP",
-      title: "MVP — минимально жизнеспособный продукт",
-      price: "390 000₽ — 790 000₽",
-      desc:
-        "Первая полноценная версия с основными потоками и аналитикой. Авторизация, онбординг, пуши, отчёты — всё для выхода на рынок. Готова к публикации и дальнейшему росту.",
-      features: [
-        "Авторизация, профили, базовые роли",
-        "Онбординг, события аналитики, пуш-уведомления",
-        "UI-кит и дизайн-система первого уровня",
-      ],
-    },
-    {
-      key: "Business+",
-      title: "Business+ — продукт для растущего бизнеса",
-      price: "от 790 000₽",
-      desc:
-        "Расширенный функционал, интеграции и масштабируемая архитектура для активного роста.",
-      features: [
-        "Интеграции с бэкендом/CRM/платежами",
-        "Ролевые модели, офлайн-режим, кеширование",
-        "Тестирование и настройка процессов релизов",
-      ],
-    },
-  ];
+  const pkgs: Pkg[] = useMemo(
+    () => [
+      {
+        key: "CFA",
+        title: "CFA — Core Feature App",
+        price: "190 000 ₽",
+        term: "1 месяц",
+        desc:
+          "Самый быстрый способ проверить гипотезу. Собираем приложение вокруг одного функционального модуля.\nЭто запуск без лишнего «обвеса» — только то, что нужно для проверки идеи и получения первых метрик.",
+        features: [
+          "Один ключевой модуль без сложных интеграций",
+          "Разработка под iOS/Android",
+          "Базовая аналитика и события",
+          "Уведомления",
+          "Стор-листинг",
+        ],
+      },
+      {
+        key: "MVP",
+        title: "MVP — минимально жизнеспособный продукт",
+        price: "от 390 000 ₽",
+        term: "2-4 месяца",
+        desc:
+          "Минимально жизнеспособный продукт с базовыми сценариями, архитектурой и аналитикой. Цель — подтвердить ценность и подготовить фундамент для развития.",
+        features: [
+          "Несколько ключевых сценариев + авторизация",
+          "UI-кит",
+          "Бэкенд/API и простая админка",
+          "Аналитика (Amplitude/Firebase) и QA",
+          "Базовые автотесты",
+        ],
+      },
+      {
+        key: "FPL",
+        title: "FPL — Full Production Launch",
+        price: "от 990 000 ₽",
+        term: "5-8 месяцев",
+        desc:
+          "Полноценный продакшен-релиз с доведённым UX, производительностью и безопасностью. Включает дизайн-систему, автотесты, мониторинг и релиз-менеджмент. Готово к росту и передаче знаний вашей команде.",
+        features: [
+          "Дизайн-система и полный UX-флоу",
+          "Интеграции с бэкендом/CRM/платежами",
+          "Производительность, мониторинг и логирование",
+          "Автотесты P0/P1, CI/CD и релиз-менеджмент",
+          "Доступность и безопасность",
+        ],
+      },
+    ],
+    []
+  );
+
+  // измеряем высоту описания у CFA и применяем как minHeight ко всем
+  const cfaDescRef = useRef<HTMLParagraphElement>(null);
+  const [descMinHeight, setDescMinHeight] = useState<number>();
+
+  useEffect(() => {
+    const measure = () => {
+      const h = cfaDescRef.current?.offsetHeight;
+      if (h && h > 0) setDescMinHeight(h);
+    };
+
+    const d = document as Document & { fonts?: { ready?: Promise<unknown> } };
+    if (d.fonts?.ready) d.fonts.ready.then(measure).catch(() => measure());
+    else measure();
+
+    const ro = new ResizeObserver(measure);
+    if (cfaDescRef.current) ro.observe(cfaDescRef.current);
+    const onResize = () => measure();
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const descStyle = descMinHeight ? ({ minHeight: descMinHeight } as const) : undefined;
 
   return (
     <section
@@ -187,12 +318,12 @@ export function Packages() {
               />
             </div>
             <p className="mt-3 text-sm text-[#A3AEC2]">
-              Выберите формат под задачу — от одной core-функции до корпоративных внедрений.
+              Выберите формат под задачу — от проверки гипотезы до полноценного продакшн-релиза.
             </p>
           </div>
         </FadeIn>
 
-        {/* Карточки */}
+        {/* Пакеты */}
         <motion.div
           variants={gridParent}
           initial="hidden"
@@ -201,14 +332,17 @@ export function Packages() {
           className="grid items-stretch gap-6 sm:gap-7 lg:gap-8 md:grid-cols-3"
         >
           {pkgs.map((p) => (
-            <PriceCard key={p.key} pkg={p} />
+            <PriceCard
+              key={p.key}
+              pkg={p}
+              descRef={p.key === "CFA" ? cfaDescRef : undefined}
+              descStyle={descStyle}
+            />
           ))}
         </motion.div>
 
-        {/* Enterprise */}
-        <div className="mt-8 sm:mt-10 lg:mt-12">
-          <EnterpriseCard />
-        </div>
+        {/* SLA блок под пакетами */}
+        <SLASection />
       </div>
     </section>
   );

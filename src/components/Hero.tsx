@@ -85,7 +85,7 @@ export function Hero() {
               animate={{ y: [0, -8, 0], rotate: [-10, -12, -10] }}
               transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
             >
-              <DeviceImage src="/iPhone16.png" alt="iPhone mock with your screen" />
+              <DeviceImage src="/pixel_pro.png" alt="iPhone mock with your screen" />
             </motion.div>
           </motion.div>
 

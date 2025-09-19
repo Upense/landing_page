@@ -10,6 +10,7 @@ type Project = {
   desc: string;
   time: string;
   images: string[];
+  nda?: boolean; // ← флаг NDA
 };
 
 type CaseCategory = {
@@ -52,16 +53,17 @@ const cases: CaseCategory[] = [
       },
       {
         id: 3,
-        title: "Cleaner",
-        desc: "Фокус на узком сценарии, минимум функций.",
+        title: "Storage Cleaner",
+        desc: "Утилита для очистки памяти/хранилища.",
         time: "3 месяца",
-        images: ["/main_screen.png", "/main_screen.png", "/main_screen.png"],
+        images: ["/cleaner1.png", "/cleaner2.png", "/cleaner3.png"],
+        nda: true, // ← скрываем скриншоты под NDA
       },
     ],
   },
   {
     key: "biz",
-    title: "Business+",
+    title: "FPL",
     projects: [
       {
         id: 1,
@@ -76,9 +78,7 @@ const cases: CaseCategory[] = [
 
 const gridParent: Variants = {
   hidden: {},
-  show: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
-  },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
 };
 
 const cardItem: Variants = {
@@ -95,7 +95,7 @@ export function Cases() {
   return (
     <section
       id="cases"
-      className="relative bg-black scroll-mt-[273px] md:scroll-mt-32 py-16 sm:py-20 lg:py-24 border-t border-white/5"
+      className="relative bg-black scroll-mt-[76px] md:scroll-mt-32 py-16 sm:py-20 lg:py-24 border-t border-white/5"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeIn>
@@ -157,14 +157,28 @@ export function Cases() {
                               ease: "easeInOut",
                               delay: i * 0.2,
                             }}
-                            className="relative aspect-[393/852] rounded-xl overflow-hidden border border-white/10"                          >
+                            className="relative aspect-[393/852] rounded-xl overflow-hidden border border-white/10"
+                          >
                             <Image
                               src={src}
                               alt={`${p.title} — экран ${i + 1}`}
                               fill
-                              className="object-cover"
+                              className={`object-cover ${
+                                p.nda ? "blur-md scale-105" : ""
+                              }`}
                               sizes="(min-width:1024px) 120px, (min-width:640px) 100px, 90px"
+                              priority={false}
                             />
+
+                            {/* NDA оверлей */}
+                            {p.nda && (
+                              <>
+                                <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/30" />
+                                <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-red-400 font-semibold tracking-wide">
+                                  NDA
+                                </span>
+                              </>
+                            )}
                           </motion.div>
                         ))}
                       </div>
